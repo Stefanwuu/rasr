@@ -136,14 +136,18 @@ void LmUtilityTool::computePerplexityFromTextFile() {
     Core::TextInputStream  tis(new Core::CompressedInputStream(paramFile(config)));
     Core::TextOutputStream out;
 
+    log("reading text from '%s'", paramFile(config).c_str());
     tis.setEncoding(paramEncoding(config));
+    out.setEncoding(paramEncoding(config));
     std::string out_file = paramScoreFile(config);
     if (not out_file.empty()) {
         out.open(out_file);
+        log("saving scores to '%s'", out_file.c_str());
     }
 
     std::vector<LMRequest> requests;
     size_t                 num_tokens   = 0;
+    size_t                 num_lines    = 0;
     Lm::Score              corpus_score = 0.0;
 
     do {
@@ -171,6 +175,7 @@ void LmUtilityTool::computePerplexityFromTextFile() {
                 requests.emplace_back(LMRequest({"\\n", lemma, t, h, 0.0f}));
                 h = lm->extendedHistory(h, t);
             }
+            ++num_lines;
         }
 
         if (not tis.good() or requests.size() >= batch_size) {
@@ -190,5 +195,6 @@ void LmUtilityTool::computePerplexityFromTextFile() {
 
     log() << Core::XmlOpen("corpus-score") << corpus_score << Core::XmlClose("corpus-score")
           << Core::XmlOpen("num-tokens") << num_tokens << Core::XmlClose("num-tokens")
+          << Core::XmlOpen("num-lines") << num_lines << Core::XmlClose("num-lines")
           << Core::XmlOpen("perplexity") << ppl << Core::XmlClose("perplexity");
 }

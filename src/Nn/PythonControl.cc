@@ -145,11 +145,7 @@ struct AlignmentToPython {
         }
         require_eq(time, alignmentVec.size());
         if (features_) {
-            // Make sure we do not have more targets than features.
-            //
-            // This is not require_eq to allow for subsampled alignments with fewer
-            // targets than features.
-            require_le(time, features_->nColumns());
+            require_eq(time, features_->nColumns());
         }
         pyAlignment.clear();
         Python::stdVec2numpy(criticalErrorFunc_, pyAlignment.obj, alignmentVec);

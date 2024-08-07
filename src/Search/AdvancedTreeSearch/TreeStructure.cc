@@ -122,38 +122,18 @@ u32 HMMStateNetwork::stateCount() const {
 }
 
 bool HMMStateNetwork::write(Core::MappedArchiveWriter writer) {
-    u32 version = DiskFormatVersionV2;
+    u32 version = DiskFormatVersion;
     writer << version << subTreeListBatches_ << states_ << edgeTargetLists_ << edgeTargetBatches_ << trees_;
     return writer.good();
 }
 
 bool HMMStateNetwork::read(Core::MappedArchiveReader reader) {
-    u32 version = 0;
+    u32 version;
     reader >> version;
-
-    if (version == DiskFormatVersionV1) {
-        std::vector<HMMStateV1> states;
-        reader >> subTreeListBatches_ >> states >> edgeTargetLists_ >> edgeTargetBatches_ >> trees_;
-
-        if (!reader.good()) {
-            return false;
-        }
-
-        states_.clear();
-        states_.reserve(states.size());
-
-        std::transform(
-                states.begin(),
-                states.end(),
-                std::back_inserter(states_),
-                [](HMMStateV1 s){ return s.toHMMState(); });
-    }
-    else if (version == DiskFormatVersionV2) {
-        reader >> subTreeListBatches_ >> states_ >> edgeTargetLists_ >> edgeTargetBatches_ >> trees_;
-    }
-    else {
+    if (version != DiskFormatVersion)
         return false;
-    }
+
+    reader >> subTreeListBatches_ >> states_ >> edgeTargetLists_ >> edgeTargetBatches_ >> trees_;
 
     return reader.good();
 }

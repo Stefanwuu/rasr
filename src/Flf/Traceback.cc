@@ -60,7 +60,6 @@ public:
     static const Core::ParameterBool         paramDumpPhonemeAlignment;
     static const Core::ParameterBool         paramDumpSubwordAlignment;
     static const Core::ParameterBool         paramFillEmptySegments;
-    static const Core::ParameterFloat        paramFrameShiftTime;
 
 private:
     Core::Channel                    dump_;
@@ -83,7 +82,6 @@ private:
     bool                       dumpPhonemeAlignment_;
     bool                       dumpSubwordAlignment_;
     bool                       fillEmptySegments_;
-    float                      frameShiftTime_;
     LatticeAlignmentBuilderRef alignmentBuilder_;
 
 protected:
@@ -372,8 +370,8 @@ protected:
                     verify(sr->nArcs() == 1);
                     const Arc&      a            = *sr->begin();
                     const Boundary &leftBoundary = boundaries.get(sr->id()), &rightBoundary = boundaries.get(a.target());
-                    f32             wordBegin = f32(leftBoundary.time()) * frameShiftTime_;
-                    f32             wordEnd   = f32(rightBoundary.time()) * frameShiftTime_;
+                    f32             wordBegin = f32(leftBoundary.time()) / 100.00;
+                    f32             wordEnd   = f32(rightBoundary.time()) / 100.00;
                     if (wordBegin < wordEnd) {
                         if (lAlphabet || lpAlphabet) {
                             std::string      word;
@@ -582,7 +580,6 @@ public:
                 dumpPhonemeAlignment_               = paramDumpPhonemeAlignment(ctmConfig);
                 dumpSubwordAlignment_               = paramDumpSubwordAlignment(ctmConfig);
                 fillEmptySegments_                  = paramFillEmptySegments(ctmConfig);
-                frameShiftTime_                     = paramFrameShiftTime(ctmConfig);
                 if (dumpPhonemeAlignment_ || dumpSubwordAlignment_) {
                     createAlignmentBuilder(ctmConfig);
                 }
@@ -592,7 +589,7 @@ public:
                         dump_ << " <" << *itKey << ">";
                     if (dumpType_)
                         dump_ << " <type>";
-                    dump_ << " [<n-best>]" << std::endl;
+                    dump_ << std::endl;
                 }
                 break;
             }
@@ -687,10 +684,6 @@ const Core::ParameterBool DumpTracebackNode::paramFillEmptySegments(
         "fill-empty-segments",
         "fill empty segments (can fix issues with sclite complaining about unsynchronized files if a segment is missing from the ctm file)",
         false);
-const Core::ParameterFloat DumpTracebackNode::paramFrameShiftTime(
-        "frame-shift-time",
-        "shift-time of frames of the lattice time axis in seconds. Defaults to 0.01 = 10ms. Important for correct word boundaries when subsampling is used.",
-        0.01);
 NodeRef createDumpTracebackNode(const std::string& name, const Core::Configuration& config) {
     return NodeRef(new DumpTracebackNode(name, config));
 }

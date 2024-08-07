@@ -113,7 +113,10 @@ protected:
     Value        defaultValue_;
     virtual bool parseString(const std::string& in, Value& out) const = 0;
     Value        getValue(const std::string& str) const;
-    Value        getValue(const class Configuration& c, const Value& _defaultValue, bool* defaultUsed = nullptr) const;
+    Value        getValue(const class Configuration& c, const Value& _defaultValue) const;
+    Value        getValue(const class Configuration& c) const {
+        return getValue(c, defaultValue_);
+    }
 
 public:
     virtual bool isValid(const Value& v) const {
@@ -145,8 +148,8 @@ public:
      * @return value of parameter in the configuration or given default
      * value @c _defaultValue if not configured.
      */
-    Value operator()(const class Configuration& c, const Value& _defaultValue, bool* defaultUsed = nullptr) const {
-        return getValue(c, _defaultValue, defaultUsed);
+    Value operator()(const class Configuration& c, const Value& _defaultValue) const {
+        return getValue(c, _defaultValue);
     }
 
     /**
@@ -155,8 +158,8 @@ public:
      * @return value of parameter in the configuration or the default
      * value if not configured.
      */
-    Value operator()(const class Configuration& c, bool* defaultUsed = nullptr) const {
-        return getValue(c, defaultValue_, defaultUsed);
+    Value operator()(const class Configuration& c) const {
+        return getValue(c);
     }
 };
 

@@ -1,7 +1,7 @@
 # GCC Compiler Settings
 
-BINDIR          =
-GCC_VERSION	=
+BINDIR      ?= /usr/bin/
+GCC_VERSION ?=
 
 # -----------------------------------------------------------------------------
 # Compiler
@@ -27,8 +27,9 @@ CCFLAGS		+= -pipe
 CCFLAGS		+= -funsigned-char
 CCFLAGS		+= -fno-exceptions
 CFLAGS		+= -std=c99
-CXXFLAGS	+= -std=gnu++0x
+CXXFLAGS	+= -std=c++17
 CXXFLAGS	+= -Wno-unknown-pragmas
+CXXFLAGS    += -fPIE
 #CCFLAGS	+= -pedantic
 CCFLAGS		+= -Wall
 CCFLAGS		+= -Wno-long-long

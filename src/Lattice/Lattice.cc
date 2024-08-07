@@ -193,32 +193,27 @@ Speech::TimeframeIndex WordLattice::maximumTime() const {
     return d.getMaximumTime();
 }
 
-StandardWordLattice::StandardWordLattice(Core::Ref<const Bliss::Lexicon>   lexicon,
-                                         AlphabetType alphabetType)
-        : alphabetType_(alphabetType) {
+StandardWordLattice::StandardWordLattice(Core::Ref<const Bliss::Lexicon> lexicon,
+                                         bool useLemmaAlphabet) {
     parts_.addChoice("acoustic", 0);
     parts_.addChoice("lm", 1);
 
     acoustic_ = Core::ref(new Fsa::StaticAutomaton);
-    lm_       = Core::ref(new Fsa::StaticAutomaton);
-
     acoustic_->setType(Fsa::TypeAcceptor);
-    lm_->setType(Fsa::TypeAcceptor);
-
-    switch (alphabetType_) {
-        case AlphabetType::LemmaAlphabet:
-            acoustic_->setInputAlphabet(lexicon->lemmaAlphabet());
-            lm_->setInputAlphabet(lexicon->lemmaAlphabet());
-            break;
-        case AlphabetType::LemmaPronunciationAlphabet:
-            acoustic_->setInputAlphabet(lexicon->lemmaPronunciationAlphabet());
-            lm_->setInputAlphabet(lexicon->lemmaPronunciationAlphabet());
-            break;
-        default:
-            defect();
+    if (useLemmaAlphabet) {
+        acoustic_->setInputAlphabet(lexicon->lemmaAlphabet());
+    } else {
+        acoustic_->setInputAlphabet(lexicon->lemmaPronunciationAlphabet());
     }
-
     acoustic_->setSemiring(Fsa::TropicalSemiring);
+
+    lm_ = Core::ref(new Fsa::StaticAutomaton);
+    lm_->setType(Fsa::TypeAcceptor);
+    if (useLemmaAlphabet) {
+        lm_->setInputAlphabet(lexicon->lemmaAlphabet());
+    } else {
+        lm_->setInputAlphabet(lexicon->lemmaPronunciationAlphabet());
+    }
     lm_->setSemiring(Fsa::TropicalSemiring);
 
     fsas_.push_back(acoustic_);
@@ -241,21 +236,16 @@ Fsa::State* StandardWordLattice::newState() {
 }
 
 void StandardWordLattice::newArc(
-        Fsa::State* source,
-        Fsa::State* target,
-        Fsa::LabelId id,
-        Speech::Score acoustic, Speech::Score lm) {
-    source -> newArc(target->id(), Fsa::Weight(acoustic), id);
-    lm_->state(source->id())->newArc(target->id(), Fsa::Weight(lm), id);
-}
-
-void StandardWordLattice::newArc(
         Fsa::State*                      source,
         Fsa::State*                      target,
         const Bliss::LemmaPronunciation* lemmaPronunciation,
         Speech::Score acoustic, Speech::Score lm) {
-    Fsa::LabelId id = lemmaPronunciation ? lemmaPronunciation->id() : Fsa::Epsilon;
-    newArc(source, target, id, acoustic, lm);
+    source->newArc(
+            target->id(),
+            Fsa::Weight(acoustic),
+            (lemmaPronunciation) ? lemmaPronunciation->id() : Fsa::Epsilon);
+
+    lm_->state(source->id())->newArc(target->id(), Fsa::Weight(lm), (lemmaPronunciation) ? lemmaPronunciation->id() : Fsa::Epsilon);
 }
 
 void StandardWordLattice::newArc(
@@ -263,8 +253,11 @@ void StandardWordLattice::newArc(
         Fsa::State* target,
         const Bliss::Lemma* lemma,
         Speech::Score acoustic, Speech::Score lm) {
-    Fsa::LabelId id = lemma ? lemma->id() : Fsa::Epsilon;
-    newArc(source, target, id, acoustic, lm);
+    source->newArc(target->id(), Fsa::Weight(acoustic),
+                   (lemma) ? lemma->id() : Fsa::Epsilon);
+
+    lm_->state(source->id())->newArc(target->id(), Fsa::Weight(lm),
+                                     (lemma) ? lemma->id() : Fsa::Epsilon);
 }
 
 void StandardWordLattice::addAcyclicProperty() {

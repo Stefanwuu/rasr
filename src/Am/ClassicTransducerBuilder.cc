@@ -155,12 +155,10 @@ ClassicTransducerBuilder::ClassicTransducerBuilder(Core::Ref<
     fixAllophoneContextAtWordBoundaries_    = paramFixAllophoneContextAtWordBoundaries(model_->getConfiguration());
     statistics_                             = new Statistics;
 
-    if (model_->phonology()->maximumHistoryLength() == 0 && model_->phonology()->maximumFutureLength() == 0) {
+    if (model_->phonology()->maximumHistoryLength() == 0 && model_->phonology()->maximumFutureLength() == 0 )
         linkWordEndStart_ = true;
-    }
-    else {
+    else
         linkWordEndStart_ = false;
-    }
 }
 
 ClassicTransducerBuilder::~ClassicTransducerBuilder() {

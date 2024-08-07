@@ -103,21 +103,12 @@ typename Parameter<T>::Value Parameter<T>::getValue(const std::string& str) cons
 
 template<class T>
 typename Parameter<T>::Value Parameter<T>::getValue(const class Configuration& c,
-                                                    const Value&               _defaultValue,
-                                                    bool*                      defaultUsed) const {
+                                                    const Value&               _defaultValue) const {
     std::string s;
-    if (c.get(name(), s)) {
-        if (defaultUsed) {
-            *defaultUsed = false;
-        }
+    if (c.get(name(), s))
         return getValue(s);
-    }
-    else {
-        if (defaultUsed) {
-            *defaultUsed = true;
-        }
+    else
         return _defaultValue;
-    }
 }
 
 namespace Core {

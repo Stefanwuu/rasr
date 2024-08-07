@@ -13,8 +13,11 @@ ifeq ($(COMPILER),gcc)
 CCFLAGS		+= -ffast-math
 # CCFLAGS     += -mfpmath=sse
 # CCFLAGS     += -funroll-loops
-CCFLAGS     += -msse3
-CCFLAGS     += -march=native
+CCFLAGS     += -msse4.1
+ifneq ($(findstring($(CPU),Opteron)),)
+CCFLAGS     += -march=opteron
+endif
+# CCFLAGS     += -march=native
 endif
 
 
@@ -23,6 +26,9 @@ ifeq ($(COMPILE),standard)
 CCFLAGS		+= -O2
 endif
 ifeq ($(COMPILE),release)
+CCFLAGS		+= -O3
+endif
+ifeq ($(COMPILE),relwithdebinfo)
 CCFLAGS		+= -O3
 endif
 ifeq ($(COMPILE),debug)

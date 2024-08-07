@@ -24,7 +24,6 @@
 #include <Core/StringUtilities.hh>
 #include <Core/TextStream.hh>
 #include <Modules.hh>
-#include <iomanip>
 
 #ifdef MODULE_THEANO_INTERFACE
 #include "TheanoSegmentOrderingVisitor.hh"
@@ -372,8 +371,7 @@ void ProgressReportingVisitorAdaptor::leaveRecording(Bliss::Recording* r) {
 }
 
 void ProgressReportingVisitorAdaptor::openSegment(Segment* s) {
-    // Print fixed 3 decimals (ms precision) for start and end times
-    channel_ << Core::XmlOpen("segment") + Core::XmlAttribute("name", s->name()) + Core::XmlAttribute("full-name", s->fullName()) + Core::XmlAttribute("track", s->track()) + Core::XmlAttribute("start", s->start(), 3, std::fixed) + Core::XmlAttribute("end", s->end(), 3, std::fixed);
+    channel_ << Core::XmlOpen("segment") + Core::XmlAttribute("name", s->name()) + Core::XmlAttribute("full-name", s->fullName()) + Core::XmlAttribute("track", s->track()) + Core::XmlAttribute("start", s->start()) + Core::XmlAttribute("end", s->end());
     if (s->condition()) {
         channel_ << Core::XmlEmpty("condition") + Core::XmlAttribute("name", s->condition()->name());
     }

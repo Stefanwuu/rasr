@@ -222,7 +222,7 @@ void Application::logSystemInfo() const {
           << XmlFull("type", info.machine)
           << XmlFull("operating-system", info.sysname)
           << XmlFull("build-date", __DATE__)
-          << XmlFull("local-time", getTime(Component::LogTimingYes))
+          << XmlFull("local-time", getTime(Component::LogTimingNo))
           << XmlClose("system-information");
     }
 }

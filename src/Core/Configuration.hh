@@ -25,7 +25,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include "Assertions.hh"
-#include "ReferenceCounting.hh"
 #include "Types.hh"
 #include "XmlStream.hh"
 
@@ -113,9 +112,10 @@ public:
     class ResourceDataBase;
 
 private:
-    Ref<ResourceDataBase> db_;
-    std::string           selection_;
-    std::string           name_;
+    ResourceDataBase* db_;
+    bool              isDataBaseOwner_;
+    std::string       selection_;
+    std::string       name_;
 
     void warning(const std::string& filename, int lineNumber,
                  const std::string& description);

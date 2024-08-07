@@ -47,9 +47,6 @@ endif
 ifdef MODULE_PYTHON
 COMMON_O += ../../Python/libSprintPython.$(a)
 endif
-ifdef MODULE_ONNX
-COMMON_O += ../../Onnx/libSprintOnnx.$(a)
-endif
 ifdef MODULE_NN
 COMMON_O += ../../Nn/libSprintNn.$(a)
 endif
@@ -65,7 +62,7 @@ SPEECH_RECOGNIZER_O = $(OBJDIR)/SpeechRecognizer.o \
 		      $(COMMON_O)
 
 FSA_SEARCH_BUILDER_O = $(OBJDIR)/FsaSearchBuilder.o \
-			  $(COMMON_O)
+			  $(COMMON_O)		   
 
 $(OBJDIR)/FsaSearchBuilder.o : CCFLAGS += -Wno-sign-compare
 
